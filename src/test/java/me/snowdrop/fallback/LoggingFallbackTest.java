@@ -1,6 +1,6 @@
 package me.snowdrop.fallback;
 
-import com.example.AnnotationOnOneMethod;
+import com.example.AnnotationOnSomeMethods;
 import com.example.LoggingFallbackApplication;
 import com.example.NoMethodAnnotated;
 import org.junit.Rule;
@@ -21,31 +21,53 @@ public class LoggingFallbackTest {
     public OutputCapture outputCapture = new OutputCapture();
 
     @Autowired
-    AnnotationOnOneMethod annotationOnOneMethod;
+    AnnotationOnSomeMethods annotationOnSomeMethods;
 
     @Autowired
     NoMethodAnnotated noMethodAnnotated;
 
     @Test
     public void testAnnotatedMethod() {
-        annotationOnOneMethod.annotatedMethod();
+        annotationOnSomeMethods.annotatedMethod();
 
-        assertThat(outputCapture.toString())
-                .containsOnlyOnce("FallbackAdvice - Before")
-                .containsOnlyOnce("FallbackAdvice - After");
+        assertLoggingFallbackCalled();
     }
 
     @Test
-    public void testMethodNotAnnotatedInClassWithOtherMethodThatIsAnnotated() {
-        annotationOnOneMethod.nonAnnotatedMethod();
+    public void testAnnotatedVoidMethod() {
+        annotationOnSomeMethods.annotatedVoidMethod();
 
-        assertThat(outputCapture.toString()).doesNotContain("FallbackAdvice");
+        assertLoggingFallbackCalled();
+    }
+
+    @Test
+    public void testMethodNotAnnotatedMethodInClassWithOtherMethodThatIsAnnotated() {
+        annotationOnSomeMethods.nonAnnotatedMethod();
+
+        assertLoggingFallbackNotCalled();
+    }
+
+    @Test
+    public void testMethodNotAnnotatedVoidMethodInClassWithOtherMethodThatIsAnnotated() {
+        annotationOnSomeMethods.nonAnnotatedMethod();
+
+        assertLoggingFallbackNotCalled();
     }
 
     @Test
     public void testMethodOfClassThatHasNoAnnotatedMethods() {
         noMethodAnnotated.dummy();
 
+        assertLoggingFallbackNotCalled();
+    }
+
+    private void assertLoggingFallbackCalled() {
+        assertThat(outputCapture.toString())
+                .containsOnlyOnce("FallbackAdvice - Before")
+                .containsOnlyOnce("FallbackAdvice - After");
+    }
+
+    private void assertLoggingFallbackNotCalled() {
         assertThat(outputCapture.toString()).doesNotContain("FallbackAdvice");
     }
 }
