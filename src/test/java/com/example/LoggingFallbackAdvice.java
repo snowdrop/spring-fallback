@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+/**
+ * Uses in tests because it allows us to more easily test more code paths than {@link me.snowdrop.fallback.DefaultFallbackAdvice}
+ */
+
 @Component
 @Primary
 public class LoggingFallbackAdvice implements FallbackAdvice {

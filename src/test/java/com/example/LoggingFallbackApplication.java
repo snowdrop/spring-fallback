@@ -5,5 +5,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableFallback
-public class ExampleApplication {
+public class LoggingFallbackApplication {
 }
