@@ -9,5 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Fallback {
 
+    /**
+     * The default value with result in the class of the method that is being annotated to be used
+     */
+    Class value() default void.class;
+
     String fallbackMethod() default  "error";
 }

@@ -25,7 +25,13 @@ public class DefaultFallbackAdvice implements FallbackAdvice {
     }
 
     private Object invokeFallback(Fallback fallback, Class<?> targetClass, Object object) throws Throwable {
-        return ReflectionUtils.findMethod(targetClass, fallback.fallbackMethod()).invoke(object);
+
+        if (fallback.value().equals(void.class)) {
+            return ReflectionUtils.findMethod(targetClass, fallback.fallbackMethod()).invoke(object);
+        }
+
+        //TODO implement non-static invocation as well, perhaps on a Spring Bean
+        return ReflectionUtils.findMethod(fallback.value(), fallback.fallbackMethod()).invoke(null);
     }
 
     private Class<?> getTargetClass(Object target) {

@@ -1,7 +1,8 @@
 package me.snowdrop.fallback;
 
+import com.example2.AnnotatedWithValueBeingOtherClass;
 import com.example2.DefaultFallbackApplication;
-import com.example2.Dummy;
+import com.example2.SomeMethodsAnnotatedWithDefaultValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +16,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DefaultFallbackTest {
 
     @Autowired
-    private Dummy dummy;
+    private SomeMethodsAnnotatedWithDefaultValue someMethodsAnnotatedWithDefaultValue;
+
+    @Autowired
+    private AnnotatedWithValueBeingOtherClass annotatedWithValueBeingOtherClass;
 
     @Test
     public void testNonErrorMethod() {
-        assertThat(dummy.normalSayHi()).isEqualTo("hi");
+        assertThat(someMethodsAnnotatedWithDefaultValue.normalSayHi()).isEqualTo("hi");
     }
 
     @Test
     public void testDefaultErrorMethod() {
-        assertThat(dummy.defaultErrorSayHi()).isEqualTo("defaultError");
+        assertThat(someMethodsAnnotatedWithDefaultValue.defaultErrorSayHi()).isEqualTo("defaultError");
     }
 
     @Test
     public void testNonDefaultErrorMethod() {
-        assertThat(dummy.nonDefaultErrorSayHi()).isEqualTo("nonDefaultError");
+        assertThat(someMethodsAnnotatedWithDefaultValue.nonDefaultErrorSayHi()).isEqualTo("nonDefaultError");
+    }
+
+    @Test
+    public void testDefaultErrorMethodOfOtherClass() {
+        assertThat(annotatedWithValueBeingOtherClass.perform()).isEqualTo("error");
     }
 }
