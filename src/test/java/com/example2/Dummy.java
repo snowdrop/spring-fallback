@@ -19,7 +19,7 @@ public class Dummy {
         return "defaultError";
     }
 
-    @Fallback(methodName = "nonDefaultError")
+    @Fallback(fallbackMethod = "nonDefaultError")
     public String nonDefaultErrorSayHi() {
         throw new RuntimeException();
     }

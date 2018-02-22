@@ -25,7 +25,7 @@ public class DefaultFallbackAdvice implements FallbackAdvice {
     }
 
     private Object invokeFallback(Fallback fallback, Class<?> targetClass, Object object) throws Throwable {
-        return ReflectionUtils.findMethod(targetClass, fallback.methodName()).invoke(object);
+        return ReflectionUtils.findMethod(targetClass, fallback.fallbackMethod()).invoke(object);
     }
 
     private Class<?> getTargetClass(Object target) {
