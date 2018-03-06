@@ -10,6 +10,9 @@ import org.springframework.aop.support.ComposablePointcut;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.aop.support.annotation.AnnotationClassFilter;
 import org.springframework.aop.support.annotation.AnnotationMethodMatcher;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ObjectUtils;
@@ -21,24 +24,26 @@ import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Configuration
-public class FallbackConfiguration extends AbstractPointcutAdvisor implements IntroductionAdvisor {
+public class FallbackConfiguration extends AbstractPointcutAdvisor implements IntroductionAdvisor, BeanFactoryAware {
 
     private Advice advice;
 
     private Pointcut pointcut;
 
+    private BeanFactory beanFactory;
+
     @PostConstruct
     public void init() {
         this.pointcut = buildPointcut(Fallback.class);
-        this.advice = buildAdvice();
+        this.advice = buildAdvice(beanFactory);
     }
 
     private Pointcut buildPointcut(Class<? extends Annotation> fallbackAnnotationType) {
         return new ComposablePointcut((Pointcut) new AnnotationClassOrMethodPointcut(fallbackAnnotationType));
     }
 
-    private Advice buildAdvice() {
-        return new AnnotationAwareFallbackOperationsInterceptor();
+    private Advice buildAdvice(BeanFactory beanFactory) {
+        return new AnnotationAwareFallbackOperationsInterceptor(beanFactory);
     }
 
     @Override
@@ -62,6 +67,11 @@ public class FallbackConfiguration extends AbstractPointcutAdvisor implements In
     @Override
     public Pointcut getPointcut() {
         return pointcut;
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
     }
 
     private static final class AnnotationClassOrMethodPointcut extends StaticMethodMatcherPointcut {

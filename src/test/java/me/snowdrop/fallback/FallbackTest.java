@@ -72,15 +72,28 @@ public class FallbackTest {
     }
 
     @Test
-    public void testDefaultErrorMethodOfOtherClass() {
-        assertThat(annotatedWithValueBeingOtherClass.method1()).isEqualTo("error");
+    public void testStaticErrorMethodOfOtherClass() {
+        assertThat(annotatedWithValueBeingOtherClass.errorHandlerInStaticClass()).isEqualTo("error");
     }
 
     @Test
-    public void testDefaultErrorMethodOfOtherClassWithParam() {
-        assertThat(annotatedWithValueBeingOtherClass.method2())
+    public void testStaticErrorMethodOfOtherClassWithParam() {
+        assertThat(annotatedWithValueBeingOtherClass.errorHandlerInStaticClassWithParam())
                 .contains("fallback")
-                .contains("method2");
+                .contains("errorHandlerInStaticClassWithParam");
+    }
+
+    @Test
+    public void testErrorMethodOfSpringBean() {
+        assertThat(annotatedWithValueBeingOtherClass.errorHandlerInSpringBean()).isEqualTo("spring error");
+    }
+
+    @Test
+    public void testErrorMethodOfSpringBeanWithParam() {
+        assertThat(annotatedWithValueBeingOtherClass.errorHandlerInSpringBeanWithParam())
+                .contains("spring")
+                .contains("fallback")
+                .contains("errorHandlerInSpringBeanWithParam");
     }
 
     @Test

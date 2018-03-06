@@ -7,12 +7,22 @@ import org.springframework.stereotype.Component;
 public class AnnotatedWithValueBeingOtherClass {
 
     @Fallback(StaticErrorHandlerWithoutParam.class)
-    public String method1() {
+    public String errorHandlerInStaticClass() {
         throw new RuntimeException();
     }
 
     @Fallback(StaticErrorHandlerWithParam.class)
-    public String method2() {
+    public String errorHandlerInStaticClassWithParam() {
+        throw new RuntimeException();
+    }
+
+    @Fallback(value = SpringErrorHandler.class, fallbackMethod = "springFallback")
+    public String errorHandlerInSpringBean() {
+        throw new RuntimeException();
+    }
+
+    @Fallback(value = SpringErrorHandler.class, fallbackMethod = "springFallbackWithParam")
+    public String errorHandlerInSpringBeanWithParam() {
         throw new RuntimeException();
     }
 }
