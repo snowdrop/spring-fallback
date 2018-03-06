@@ -74,19 +74,24 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
 						return delegatesForTarget.put(method, null);
 					}
 					MethodInterceptor delegate;
-                    if (fallback.value().equals(void.class)) {
-                        delegate = new NonStaticErrorHandlerFallbackOperationsInterceptor(
-                                        getTargetClass(target), target, fallback.fallbackMethod()
-                        );
+                    if (fallback.value().equals(void.class)) { //we need to use the fallback method of the target class
+                        final Method targetMethod = findTargetMethod(getTargetClass(target), fallback.fallbackMethod());
+
+                        if (targetMethod == null) {
+                            throw new IllegalArgumentException(target + " does not contain a method named '" + fallback.fallbackMethod() + "'");
+                        }
+
+                        delegate = new NonStaticErrorHandlerFallbackOperationsInterceptor(targetMethod, target);
                     }
                     else {
-                        final Method targetMethod = ReflectionUtils.findMethod(
-                                fallback.value(), fallback.fallbackMethod()
-                        );
+                        final Method targetMethod = findTargetMethod(fallback.value(), fallback.fallbackMethod());
+
+                        if (targetMethod == null) {
+                            throw new IllegalArgumentException(fallback.value() + " does not contain a static method named '" + fallback.fallbackMethod() + "'");
+                        }
+
                         if (Modifier.isStatic(targetMethod.getModifiers())) {
-                            delegate = new StaticErrorHandlerFallbackOperationsInterceptor(
-                                    fallback.value(), fallback.fallbackMethod()
-                            );
+                            delegate = new StaticErrorHandlerFallbackOperationsInterceptor(targetMethod);
                         }
                         else {
                             throw new UnsupportedOperationException("Using arbitrary object handlers is not currently supported");
@@ -99,7 +104,17 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
 		return this.delegatesCache.get(target).get(method);
 	}
 
-	private Fallback findAnnotationOnTarget(Object target, Method method) {
+    private Method findTargetMethod(Class fallbackClass, String fallbackMethod) {
+        final Method noArgsMethod = ReflectionUtils.findMethod(fallbackClass, fallbackMethod);
+
+        if (null != noArgsMethod) {
+            return noArgsMethod;
+        }
+
+        return ReflectionUtils.findMethod(fallbackClass, fallbackMethod, ExecutionContext.class);
+    }
+
+    private Fallback findAnnotationOnTarget(Object target, Method method) {
 		try {
 			final Method targetMethod = target.getClass().getMethod(method.getName(), method.getParameterTypes());
             final Fallback fallback = AnnotationUtils.findAnnotation(targetMethod, Fallback.class);

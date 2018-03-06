@@ -2,23 +2,26 @@ package me.snowdrop.fallback.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Method;
 
 public class NonStaticErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
 
-    private final Class<?> targetClass;
+    private final Method targetMethod;
     private final Object handlerObject;
-    private final String methodName;
 
     public NonStaticErrorHandlerFallbackOperationsInterceptor(
-            Class<?> targetClass, Object handlerObject, String methodName) {
-        this.targetClass = targetClass;
+            Method targetMethod, Object handlerObject) {
+        this.targetMethod = targetMethod;
         this.handlerObject = handlerObject;
-        this.methodName = methodName;
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        return ReflectionUtils.findMethod(targetClass, methodName).invoke(handlerObject);
+        return HandlerMethodInvokerUtil.invoke(
+                targetMethod,
+                handlerObject,
+                DefaultExecutionContext.fromMethodInvocation(invocation)
+        );
     }
 }

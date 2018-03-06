@@ -6,8 +6,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AnnotatedWithValueBeingOtherClass {
 
-    @Fallback(StaticErrorHandler.class)
-    public String perform() {
+    @Fallback(StaticErrorHandlerWithoutParam.class)
+    public String method1() {
+        throw new RuntimeException();
+    }
+
+    @Fallback(StaticErrorHandlerWithParam.class)
+    public String method2() {
         throw new RuntimeException();
     }
 }

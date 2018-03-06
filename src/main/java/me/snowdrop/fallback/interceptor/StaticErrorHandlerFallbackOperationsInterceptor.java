@@ -2,20 +2,23 @@ package me.snowdrop.fallback.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Method;
 
 public class StaticErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
 
-    private final Class<?> targetClass;
-    private final String methodName;
+    private final Method targetMethod;
 
-    public StaticErrorHandlerFallbackOperationsInterceptor(Class<?> targetClass, String methodName) {
-        this.targetClass = targetClass;
-        this.methodName = methodName;
+    public StaticErrorHandlerFallbackOperationsInterceptor(Method targetMethod) {
+        this.targetMethod = targetMethod;
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        return ReflectionUtils.findMethod(targetClass, methodName).invoke(null);
+        return HandlerMethodInvokerUtil.invoke(
+                targetMethod,
+                null,
+                DefaultExecutionContext.fromMethodInvocation(invocation)
+        );
     }
 }

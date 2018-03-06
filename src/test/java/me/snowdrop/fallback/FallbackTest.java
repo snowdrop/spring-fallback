@@ -65,13 +65,22 @@ public class FallbackTest {
     }
 
     @Test
-    public void testNonDefaultErrorMethod() {
-        assertThat(someMethodsAnnotatedWithDefaultValue.nonDefaultErrorSayHi()).isEqualTo("nonDefaultError");
+    public void testNonDefaultErrorMethodWithParam() {
+        assertThat(someMethodsAnnotatedWithDefaultValue.nonDefaultErrorSayHi())
+                .contains("fallback")
+                .contains("nonDefaultErrorSayHi");
     }
 
     @Test
     public void testDefaultErrorMethodOfOtherClass() {
-        assertThat(annotatedWithValueBeingOtherClass.perform()).isEqualTo("error");
+        assertThat(annotatedWithValueBeingOtherClass.method1()).isEqualTo("error");
+    }
+
+    @Test
+    public void testDefaultErrorMethodOfOtherClassWithParam() {
+        assertThat(annotatedWithValueBeingOtherClass.method2())
+                .contains("fallback")
+                .contains("method2");
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.example;
 
+import me.snowdrop.fallback.ExecutionContext;
 import me.snowdrop.fallback.Fallback;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ public class SomeMethodsAnnotatedWithDefaultValue {
         throw new RuntimeException();
     }
 
-    public String nonDefaultError() {
-        return "nonDefaultError";
+    public String nonDefaultError(ExecutionContext executionContext) {
+        return "fallback from" + executionContext.getMethod().getName();
     }
 }
