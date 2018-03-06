@@ -4,6 +4,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class NonStaticErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
 
@@ -14,6 +15,10 @@ public class NonStaticErrorHandlerFallbackOperationsInterceptor implements Metho
             Method targetMethod, Object handlerObject) {
         this.targetMethod = targetMethod;
         this.handlerObject = handlerObject;
+
+        if (Modifier.isPrivate(targetMethod.getModifiers())) {
+            targetMethod.setAccessible(true);
+        }
     }
 
     @Override

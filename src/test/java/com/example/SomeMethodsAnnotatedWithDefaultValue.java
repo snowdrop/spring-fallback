@@ -16,7 +16,7 @@ public class SomeMethodsAnnotatedWithDefaultValue {
         throw new RuntimeException();
     }
 
-    public String error() {
+    private String error() {
         return "defaultError";
     }
 

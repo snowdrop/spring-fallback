@@ -60,7 +60,7 @@ public class FallbackTest {
     }
 
     @Test
-    public void testDefaultErrorMethod() {
+    public void testPrivateDefaultErrorMethod() {
         assertThat(someMethodsAnnotatedWithDefaultValue.defaultErrorSayHi()).isEqualTo("defaultError");
     }
 
