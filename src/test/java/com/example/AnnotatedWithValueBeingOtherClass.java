@@ -1,4 +1,4 @@
-package com.example2;
+package com.example;
 
 import me.snowdrop.fallback.Fallback;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AnnotatedWithValueBeingOtherClass {
 
-    @Fallback(ErrorHandler.class)
+    @Fallback(StaticErrorHandler.class)
     public String perform() {
         throw new RuntimeException();
     }

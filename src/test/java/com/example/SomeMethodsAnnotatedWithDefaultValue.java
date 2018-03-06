@@ -1,4 +1,4 @@
-package com.example2;
+package com.example;
 
 import me.snowdrop.fallback.Fallback;
 import org.springframework.stereotype.Component;
