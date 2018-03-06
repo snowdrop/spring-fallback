@@ -5,7 +5,7 @@ import me.snowdrop.fallback.Fallback;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SomeMethodsAnnotatedWithDefaultValue {
+public class SomeMethodsAnnotated {
 
     public String normalSayHi() {
         return "hi";

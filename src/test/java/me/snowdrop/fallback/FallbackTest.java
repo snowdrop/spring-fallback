@@ -4,23 +4,29 @@ import com.example.AnnotatedWithValueBeingOtherClass;
 import com.example.DefaultFallbackApplication;
 import com.example.NoMethodAnnotated;
 import com.example.SomeInterface;
-import com.example.SomeMethodsAnnotatedWithDefaultValue;
+import com.example.SomeMethodsAnnotated;
 import com.example.SomeSubClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DefaultFallbackApplication.class)
+@TestPropertySource(
+        properties = {
+                "fallback.name=fallback2",
+        }
+)
 public class FallbackTest {
 
     @Autowired
-    private SomeMethodsAnnotatedWithDefaultValue someMethodsAnnotatedWithDefaultValue;
+    private SomeMethodsAnnotated someMethodsAnnotated;
 
     @Autowired
     private AnnotatedWithValueBeingOtherClass annotatedWithValueBeingOtherClass;
@@ -34,6 +40,9 @@ public class FallbackTest {
     @Autowired
     private SomeSubClass someSubClass;
 
+    @Autowired
+    private com.example.AnnotatedWithProperty annotatedWithProperty;
+
     @Test
     public void testClassWithNoMethodAnnotated() {
         assertThat(AopUtils.isAopProxy(noMethodAnnotated)).isFalse();
@@ -41,7 +50,7 @@ public class FallbackTest {
 
     @Test
     public void testClassWithAnnotatedMethodsIsProxy() {
-        assertThat(AopUtils.isAopProxy(someMethodsAnnotatedWithDefaultValue)).isTrue();
+        assertThat(AopUtils.isAopProxy(someMethodsAnnotated)).isTrue();
     }
 
     @Test
@@ -56,17 +65,17 @@ public class FallbackTest {
 
     @Test
     public void testNonErrorMethod() {
-        assertThat(someMethodsAnnotatedWithDefaultValue.normalSayHi()).isEqualTo("hi");
+        assertThat(someMethodsAnnotated.normalSayHi()).isEqualTo("hi");
     }
 
     @Test
     public void testPrivateDefaultErrorMethod() {
-        assertThat(someMethodsAnnotatedWithDefaultValue.defaultErrorSayHi()).isEqualTo("defaultError");
+        assertThat(someMethodsAnnotated.defaultErrorSayHi()).isEqualTo("defaultError");
     }
 
     @Test
     public void testNonDefaultErrorMethodWithParam() {
-        assertThat(someMethodsAnnotatedWithDefaultValue.nonDefaultErrorSayHi())
+        assertThat(someMethodsAnnotated.nonDefaultErrorSayHi())
                 .contains("fallback")
                 .contains("nonDefaultErrorSayHi");
     }
@@ -114,5 +123,10 @@ public class FallbackTest {
     @Test
     public void testNonAnnotatedMethodFromSuperClass() {
         assertThat(someSubClass.nonAnnotatedMethod()).isNotNull();
+    }
+
+    @Test
+    public void testAnnotatedWithExpression() {
+         assertThat(annotatedWithProperty.invoke()).isEqualTo("fallback2");
     }
 }

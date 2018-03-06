@@ -14,5 +14,10 @@ public @interface Fallback {
      */
     Class value() default void.class;
 
+    /**
+     * The method to be executed as the fallback method
+     * If the name is enclosed in '${}' the it is assumed to be a property
+     * and will be looked up in the Spring Environment
+     */
     String fallbackMethod() default  "error";
 }

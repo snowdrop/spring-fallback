@@ -24,8 +24,10 @@ import org.springframework.aop.IntroductionInterceptor;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -125,20 +127,22 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
     }
 
     private MethodInterceptor getDelegate(Object target, Fallback fallback) {
+        final String methodName = getMethodName(fallback);
+
         if (fallback.value().equals(void.class)) { //we need to use the fallback method of the target class
-            final Method targetMethod = findTargetMethod(getTargetClass(target), fallback.fallbackMethod());
+            final Method targetMethod = findTargetMethod(getTargetClass(target), methodName);
 
             if (targetMethod == null) {
-                throw new IllegalArgumentException(target + " does not contain a method named '" + fallback.fallbackMethod() + "'");
+                throw new IllegalArgumentException(target + " does not contain a method named '" + methodName + "'");
             }
 
             return new NonStaticErrorHandlerFallbackOperationsInterceptor(targetMethod, target);
         }
         else {
-            final Method targetMethod = findTargetMethod(fallback.value(), fallback.fallbackMethod());
+            final Method targetMethod = findTargetMethod(fallback.value(), methodName);
 
             if (targetMethod == null) {
-                throw new IllegalArgumentException(fallback.value() + " does not contain a static method named '" + fallback.fallbackMethod() + "'");
+                throw new IllegalArgumentException(fallback.value() + " does not contain a static method named '" + methodName + "'");
             }
 
             if (Modifier.isStatic(targetMethod.getModifiers())) {  //in this a static method is used
@@ -158,6 +162,27 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
 
             }
         }
+    }
+
+    private String getMethodName(Fallback fallback) {
+        if (StringUtils.startsWithIgnoreCase(fallback.fallbackMethod(), "${")
+                && StringUtils.endsWithIgnoreCase(fallback.fallbackMethod(), "}")) {
+            return resolveProperty(fallback.fallbackMethod());
+        }
+
+        return fallback.fallbackMethod();
+    }
+
+    /**
+     * Resolve the specified value if possible.
+     *
+     * @see ConfigurableBeanFactory#resolveEmbeddedValue
+     */
+    private String resolveProperty(String value) {
+        if (this.beanFactory != null && this.beanFactory instanceof ConfigurableBeanFactory) {
+            return ((ConfigurableBeanFactory) this.beanFactory).resolveEmbeddedValue(value);
+        }
+        return value;
     }
 
     private Class<?> getTargetClass(Object target) {
