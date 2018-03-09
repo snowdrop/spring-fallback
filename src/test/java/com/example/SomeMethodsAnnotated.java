@@ -1,7 +1,7 @@
 package com.example;
 
-import me.snowdrop.fallback.ExecutionContext;
-import me.snowdrop.fallback.Fallback;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +21,7 @@ public class SomeMethodsAnnotated {
         throw new RuntimeException();
     }
 
-    private String error() {
+    private String handle() {
         return "defaultError";
     }
 

@@ -15,7 +15,7 @@ public class SomeInterfaceImpl implements SomeInterface {
         throw new RuntimeException();
     }
 
-    public String error() {
+    public String handle() {
         return "error";
     }
 }

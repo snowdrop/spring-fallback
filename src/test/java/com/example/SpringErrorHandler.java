@@ -1,16 +1,22 @@
 package com.example;
 
-import me.snowdrop.fallback.ExecutionContext;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
+import org.eclipse.microprofile.faulttolerance.FallbackHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SpringErrorHandler {
+public class SpringErrorHandler implements FallbackHandler<String> {
 
-    public String springFallback() {
-        return "spring error";
+    @Override
+    public String handle(ExecutionContext context) {
+        return "default";
     }
 
-    public String springFallbackWithParam(ExecutionContext executionContext) {
+    public String nonDefaultFallback() {
+        return "spring fallback";
+    }
+
+    public String nonDefaultFallbackWithParam(ExecutionContext executionContext) {
         return "spring fallback for " + executionContext.getMethod().getName();
     }
 }

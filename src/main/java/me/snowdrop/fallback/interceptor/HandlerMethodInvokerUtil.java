@@ -1,6 +1,6 @@
 package me.snowdrop.fallback.interceptor;
 
-import me.snowdrop.fallback.ExecutionContext;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.InvocationTargetException;

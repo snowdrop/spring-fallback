@@ -1,6 +1,6 @@
 package com.example;
 
-import me.snowdrop.fallback.Fallback;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 
 public interface SomeInterface {
 

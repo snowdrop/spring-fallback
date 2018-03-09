@@ -16,10 +16,11 @@
 
 package me.snowdrop.fallback;
 
-import me.snowdrop.fallback.interceptor.NonStaticErrorHandlerFallbackOperationsInterceptor;
-import me.snowdrop.fallback.interceptor.StaticErrorHandlerFallbackOperationsInterceptor;
+import me.snowdrop.fallback.interceptor.DefaultErrorHandlerFallbackOperationsInterceptor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -29,7 +30,6 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +40,8 @@ import java.util.Map;
  */
 public class AnnotationAwareFallbackOperationsInterceptor implements MethodInterceptor {
 
-	private final Map<Object, Map<Method, MethodInterceptor>> delegatesCache = new HashMap<>();
+    private static final String DEFAULT_FALLBACK_METHOD_NAME = "handle";
+    private final Map<Object, Map<Method, MethodInterceptor>> delegatesCache = new HashMap<>();
 
 	private final BeanFactory beanFactory;
 
@@ -123,14 +124,14 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
     private MethodInterceptor getDelegate(Object target, Fallback fallback) {
         final String methodName = getMethodName(fallback);
 
-        if (fallback.value().equals(void.class)) { //we need to use the fallback method of the target class
-            final Method targetFallbackMethod = findTargetMethod(getTargetClass(target), methodName);
+        if (fallback.value().equals(Fallback.DEFAULT.class)) { //we need to use the fallback method of the target class
+            final Method targetMethod = findTargetMethod(getTargetClass(target), methodName);
 
-            if (targetFallbackMethod == null) {
-                throw new IllegalArgumentException(target + " does not contain a method named '" + methodName + "'");
+            if (targetMethod == null) {
+                throw new IllegalArgumentException(createMethodDoesNotExistsErrorMessage(target, methodName));
             }
 
-            return new NonStaticErrorHandlerFallbackOperationsInterceptor(targetFallbackMethod, target);
+            return new DefaultErrorHandlerFallbackOperationsInterceptor(targetMethod, target);
         }
         else {
             final Method targetFallbackMethod = findTargetMethod(fallback.value(), methodName);
@@ -138,33 +139,32 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
             if (targetFallbackMethod == null) {
                 throw new IllegalArgumentException(fallback.value() + " does not contain a static method named '" + methodName + "'");
             }
-
-            if (Modifier.isStatic(targetFallbackMethod.getModifiers())) {  //in this a static method is used
-                return new StaticErrorHandlerFallbackOperationsInterceptor(targetFallbackMethod);
-            }
-            else { //finally we attempt to find a Spring bean using the class supplied
-
-                try {
-                    return new NonStaticErrorHandlerFallbackOperationsInterceptor(
-                            targetFallbackMethod,
-                            beanFactory.getBean(fallback.value())
-                    );
-                } catch (BeansException e) {
-                    throw new UnsupportedOperationException("Unable to retrieve bean of class " + fallback.value(), e);
-                }
-
-
+            try { //we attempt to find a Spring bean using the class supplied
+                return new DefaultErrorHandlerFallbackOperationsInterceptor(
+                        targetFallbackMethod,
+                        beanFactory.getBean(fallback.value())
+                );
+            } catch (BeansException e) {
+                throw new UnsupportedOperationException("Unable to retrieve bean of class " + fallback.value(), e);
             }
         }
     }
 
     private String getMethodName(Fallback fallback) {
+        if (fallback.fallbackMethod().equals("")) {
+            return DEFAULT_FALLBACK_METHOD_NAME;
+        }
+
         if (StringUtils.startsWithIgnoreCase(fallback.fallbackMethod(), "${")
                 && StringUtils.endsWithIgnoreCase(fallback.fallbackMethod(), "}")) {
             return resolveProperty(fallback.fallbackMethod());
         }
 
         return fallback.fallbackMethod();
+    }
+
+    private String createMethodDoesNotExistsErrorMessage(Object target, String methodName) {
+        return target + " does not contain a method named '" + methodName + "'";
     }
 
     /**

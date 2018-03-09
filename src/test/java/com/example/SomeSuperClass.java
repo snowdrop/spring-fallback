@@ -1,6 +1,6 @@
 package com.example;
 
-import me.snowdrop.fallback.Fallback;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 
 public class SomeSuperClass {
 
@@ -13,7 +13,7 @@ public class SomeSuperClass {
         return new Object();
     }
 
-    public Object error() {
+    public Object handle() {
         return null;
     }
 }

@@ -1,28 +1,23 @@
 package com.example;
 
-import me.snowdrop.fallback.Fallback;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AnnotatedWithValueBeingOtherClass {
 
-    @Fallback(StaticErrorHandlerWithoutParam.class)
-    public String errorHandlerInStaticClass() {
+    @Fallback(value = SpringErrorHandler.class)
+    public String errorHandlerInSpringBeanDefaultMethod() {
         throw new RuntimeException();
     }
 
-    @Fallback(StaticErrorHandlerWithParam.class)
-    public String errorHandlerInStaticClassWithParam() {
+    @Fallback(value = SpringErrorHandler.class, fallbackMethod = "nonDefaultFallback")
+    public String errorHandlerInSpringBeanNonDefaultMethod() {
         throw new RuntimeException();
     }
 
-    @Fallback(value = SpringErrorHandler.class, fallbackMethod = "springFallback")
-    public String errorHandlerInSpringBean() {
-        throw new RuntimeException();
-    }
-
-    @Fallback(value = SpringErrorHandler.class, fallbackMethod = "springFallbackWithParam")
-    public String errorHandlerInSpringBeanWithParam() {
+    @Fallback(value = SpringErrorHandler.class, fallbackMethod = "nonDefaultFallbackWithParam")
+    public String errorHandlerInSpringBeanNonDefaultMethodWithParam() {
         throw new RuntimeException();
     }
 }

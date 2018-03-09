@@ -6,12 +6,12 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public class NonStaticErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
+public class DefaultErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
 
     private final Method targetFallbackMethod;
     private final Object handlerObject;
 
-    public NonStaticErrorHandlerFallbackOperationsInterceptor(
+    public DefaultErrorHandlerFallbackOperationsInterceptor(
             Method targetFallbackMethod, Object handlerObject) {
         this.targetFallbackMethod = targetFallbackMethod;
         this.handlerObject = handlerObject;

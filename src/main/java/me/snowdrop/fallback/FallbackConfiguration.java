@@ -1,6 +1,7 @@
 package me.snowdrop.fallback;
 
 import org.aopalliance.aop.Advice;
+import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.IntroductionAdvisor;
 import org.springframework.aop.MethodMatcher;
