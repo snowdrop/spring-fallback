@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Configuration
-public class FallbackConfiguration extends AbstractPointcutAdvisor implements IntroductionAdvisor, BeanFactoryAware {
+public class FallbackConfiguration extends AbstractPointcutAdvisor implements BeanFactoryAware {
 
     private Advice advice;
 
@@ -45,19 +45,6 @@ public class FallbackConfiguration extends AbstractPointcutAdvisor implements In
     private Advice buildAdvice(BeanFactory beanFactory) {
         return new AnnotationAwareFallbackOperationsInterceptor(beanFactory);
     }
-
-    @Override
-    public ClassFilter getClassFilter() {
-        return pointcut.getClassFilter();
-    }
-
-    @Override
-    public Class<?>[] getInterfaces() {
-        return new Class[] { me.snowdrop.fallback.interceptor.Fallback.class };
-    }
-
-    @Override
-    public void validateInterfaces() throws IllegalArgumentException {}
 
     @Override
     public Advice getAdvice() {

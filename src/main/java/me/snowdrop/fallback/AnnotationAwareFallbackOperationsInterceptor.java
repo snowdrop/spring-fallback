@@ -20,7 +20,6 @@ import me.snowdrop.fallback.interceptor.NonStaticErrorHandlerFallbackOperationsI
 import me.snowdrop.fallback.interceptor.StaticErrorHandlerFallbackOperationsInterceptor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.IntroductionInterceptor;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -39,7 +38,7 @@ import java.util.Map;
  * delegates to an appropriate FallbackOperationsInterceptor.
  *
  */
-public class AnnotationAwareFallbackOperationsInterceptor implements IntroductionInterceptor {
+public class AnnotationAwareFallbackOperationsInterceptor implements MethodInterceptor {
 
 	private final Map<Object, Map<Method, MethodInterceptor>> delegatesCache = new HashMap<>();
 
@@ -48,11 +47,6 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
     public AnnotationAwareFallbackOperationsInterceptor(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
-
-    @Override
-	public boolean implementsInterface(Class<?> intf) {
-		return me.snowdrop.fallback.interceptor.Fallback.class.isAssignableFrom(intf);
-	}
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
