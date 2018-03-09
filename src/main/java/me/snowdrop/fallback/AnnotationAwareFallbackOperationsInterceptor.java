@@ -71,7 +71,7 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
 				if (!this.delegatesCache.containsKey(target)) {
 					this.delegatesCache.put(target, new HashMap<>());
 				}
-				Map<Method, MethodInterceptor> delegatesForTarget = this.delegatesCache.get(target);
+				final Map<Method, MethodInterceptor> delegatesForTarget = this.delegatesCache.get(target);
 				if (!delegatesForTarget.containsKey(method)) {
                     final Fallback fallback = findAnnotation(target, method);
 					if (fallback == null) { //if the target does not contain the fallback method, create a cache entry with a null value
@@ -186,11 +186,12 @@ public class AnnotationAwareFallbackOperationsInterceptor implements Introductio
     }
 
     private Class<?> getTargetClass(Object target) {
-        Class<?> targetClass = AopProxyUtils.ultimateTargetClass(target);
-        if (targetClass == null && target != null) {
-            targetClass = target.getClass();
+        final Class<?> targetClass = AopProxyUtils.ultimateTargetClass(target);
+        if (targetClass != null) {
+            return targetClass;
         }
-        return targetClass;
+
+        return target.getClass();
     }
 
 }
