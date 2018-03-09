@@ -124,29 +124,29 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
         final String methodName = getMethodName(fallback);
 
         if (fallback.value().equals(void.class)) { //we need to use the fallback method of the target class
-            final Method targetMethod = findTargetMethod(getTargetClass(target), methodName);
+            final Method targetFallbackMethod = findTargetMethod(getTargetClass(target), methodName);
 
-            if (targetMethod == null) {
+            if (targetFallbackMethod == null) {
                 throw new IllegalArgumentException(target + " does not contain a method named '" + methodName + "'");
             }
 
-            return new NonStaticErrorHandlerFallbackOperationsInterceptor(targetMethod, target);
+            return new NonStaticErrorHandlerFallbackOperationsInterceptor(targetFallbackMethod, target);
         }
         else {
-            final Method targetMethod = findTargetMethod(fallback.value(), methodName);
+            final Method targetFallbackMethod = findTargetMethod(fallback.value(), methodName);
 
-            if (targetMethod == null) {
+            if (targetFallbackMethod == null) {
                 throw new IllegalArgumentException(fallback.value() + " does not contain a static method named '" + methodName + "'");
             }
 
-            if (Modifier.isStatic(targetMethod.getModifiers())) {  //in this a static method is used
-                return new StaticErrorHandlerFallbackOperationsInterceptor(targetMethod);
+            if (Modifier.isStatic(targetFallbackMethod.getModifiers())) {  //in this a static method is used
+                return new StaticErrorHandlerFallbackOperationsInterceptor(targetFallbackMethod);
             }
             else { //finally we attempt to find a Spring bean using the class supplied
 
                 try {
                     return new NonStaticErrorHandlerFallbackOperationsInterceptor(
-                            targetMethod,
+                            targetFallbackMethod,
                             beanFactory.getBean(fallback.value())
                     );
                 } catch (BeansException e) {

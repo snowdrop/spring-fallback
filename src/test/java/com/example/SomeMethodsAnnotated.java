@@ -7,8 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class SomeMethodsAnnotated {
 
-    public String normalSayHi() {
-        return "hi";
+    public String isAnnotatedAndDoesNotThrowException() {
+        return "default";
+    }
+
+    @Fallback
+    public String isAnnotatedButDoesNotThrowException() {
+        return "default";
     }
 
     @Fallback

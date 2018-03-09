@@ -64,8 +64,13 @@ public class FallbackTest {
     }
 
     @Test
-    public void testNonErrorMethod() {
-        assertThat(someMethodsAnnotated.normalSayHi()).isEqualTo("hi");
+    public void testMethodThatsIsNotAnnotatedAndDoesNotThrowException() {
+        assertThat(someMethodsAnnotated.isAnnotatedAndDoesNotThrowException()).isEqualTo("default");
+    }
+
+    @Test
+    public void testMethodThatsIsAnnotatedButDoesNotThrowException() {
+        assertThat(someMethodsAnnotated.isAnnotatedButDoesNotThrowException()).isEqualTo("default");
     }
 
     @Test

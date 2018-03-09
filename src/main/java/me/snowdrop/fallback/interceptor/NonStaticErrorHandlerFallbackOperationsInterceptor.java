@@ -8,25 +8,21 @@ import java.lang.reflect.Modifier;
 
 public class NonStaticErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
 
-    private final Method targetMethod;
+    private final Method targetFallbackMethod;
     private final Object handlerObject;
 
     public NonStaticErrorHandlerFallbackOperationsInterceptor(
-            Method targetMethod, Object handlerObject) {
-        this.targetMethod = targetMethod;
+            Method targetFallbackMethod, Object handlerObject) {
+        this.targetFallbackMethod = targetFallbackMethod;
         this.handlerObject = handlerObject;
 
-        if (Modifier.isPrivate(targetMethod.getModifiers())) {
-            targetMethod.setAccessible(true);
+        if (Modifier.isPrivate(targetFallbackMethod.getModifiers())) {
+            targetFallbackMethod.setAccessible(true);
         }
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        return HandlerMethodInvokerUtil.invoke(
-                targetMethod,
-                handlerObject,
-                DefaultExecutionContext.fromMethodInvocation(invocation)
-        );
+        return HandlerMethodInvokerUtil.invoke(invocation, targetFallbackMethod, handlerObject);
     }
 }

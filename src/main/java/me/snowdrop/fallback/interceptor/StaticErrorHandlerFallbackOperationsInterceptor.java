@@ -15,10 +15,6 @@ public class StaticErrorHandlerFallbackOperationsInterceptor implements MethodIn
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        return HandlerMethodInvokerUtil.invoke(
-                targetMethod,
-                null,
-                DefaultExecutionContext.fromMethodInvocation(invocation)
-        );
+        return HandlerMethodInvokerUtil.invoke(invocation, targetMethod, null);
     }
 }
