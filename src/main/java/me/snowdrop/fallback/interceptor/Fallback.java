@@ -5,8 +5,6 @@ package me.snowdrop.fallback.interceptor;
  * proxy creators that use the {@link StaticErrorHandlerFallbackOperationsInterceptor} and
  * {@link NonStaticErrorHandlerFallbackOperationsInterceptor}.
  *
- * @author Dave Syer
- * @since 1.1
  */
 public interface Fallback {
 }
