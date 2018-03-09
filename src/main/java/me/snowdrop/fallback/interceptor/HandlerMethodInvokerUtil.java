@@ -5,7 +5,9 @@ import me.snowdrop.fallback.ExecutionContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class HandlerMethodInvokerUtil {
+final class HandlerMethodInvokerUtil {
+
+    private HandlerMethodInvokerUtil() {}
 
     static Object invoke(Method targetMethod, Object targetObject, ExecutionContext executionContext)
             throws InvocationTargetException, IllegalAccessException {

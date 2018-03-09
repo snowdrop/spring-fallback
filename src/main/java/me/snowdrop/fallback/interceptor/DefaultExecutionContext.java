@@ -5,7 +5,7 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
 
-class DefaultExecutionContext implements ExecutionContext {
+final class DefaultExecutionContext implements ExecutionContext {
 
     private final Method method;
     private final Object[] parameters;
