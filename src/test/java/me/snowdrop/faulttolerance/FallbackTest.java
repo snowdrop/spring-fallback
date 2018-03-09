@@ -1,11 +1,12 @@
-package me.snowdrop.fallback;
+package me.snowdrop.faulttolerance;
 
-import com.example.AnnotatedWithValueBeingOtherClass;
-import com.example.DefaultFallbackApplication;
-import com.example.NoMethodAnnotated;
-import com.example.SomeInterface;
-import com.example.SomeMethodsAnnotated;
-import com.example.SomeSubClass;
+import com.example.fallback.AnnotatedWithProperty;
+import com.example.fallback.AnnotatedWithValueBeingOtherClass;
+import com.example.fallback.FallbackApplication;
+import com.example.fallback.NoMethodAnnotated;
+import com.example.fallback.SomeInterface;
+import com.example.fallback.SomeMethodsAnnotated;
+import com.example.fallback.SomeSubClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.aop.support.AopUtils;
@@ -17,10 +18,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = DefaultFallbackApplication.class)
+@SpringBootTest(classes = FallbackApplication.class)
 @TestPropertySource(
         properties = {
-                "fallback.name=fallback2",
+                "faulttolerance.name=fallback2",
         }
 )
 public class FallbackTest {
@@ -41,7 +42,7 @@ public class FallbackTest {
     private SomeSubClass someSubClass;
 
     @Autowired
-    private com.example.AnnotatedWithProperty annotatedWithProperty;
+    private AnnotatedWithProperty annotatedWithProperty;
 
     @Test
     public void testClassWithNoMethodAnnotated() {
@@ -81,7 +82,7 @@ public class FallbackTest {
     @Test
     public void testNonDefaultErrorMethodWithParam() {
         assertThat(someMethodsAnnotated.nonDefaultErrorSayHi())
-                .contains("fallback")
+                .contains("faulttolerance")
                 .contains("nonDefaultErrorSayHi");
     }
 
@@ -93,14 +94,14 @@ public class FallbackTest {
     @Test
     public void testErrorMethodOfSpringBeanNonDefaultFallbackMethod() {
         assertThat(annotatedWithValueBeingOtherClass.errorHandlerInSpringBeanNonDefaultMethod())
-                .isEqualTo("spring fallback");
+                .isEqualTo("spring faulttolerance");
     }
 
     @Test
     public void testErrorMethodOfSpringBeanNonDefaultFallbackMethodWithParam() {
         assertThat(annotatedWithValueBeingOtherClass.errorHandlerInSpringBeanNonDefaultMethodWithParam())
                 .contains("spring")
-                .contains("fallback")
+                .contains("faulttolerance")
                 .contains("errorHandlerInSpringBeanNonDefaultMethodWithParam");
     }
 

@@ -1,4 +1,4 @@
-package com.example;
+package com.example.fallback;
 
 import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 import org.eclipse.microprofile.faulttolerance.FallbackHandler;
@@ -13,10 +13,10 @@ public class SpringErrorHandler implements FallbackHandler<String> {
     }
 
     public String nonDefaultFallback() {
-        return "spring fallback";
+        return "spring faulttolerance";
     }
 
     public String nonDefaultFallbackWithParam(ExecutionContext executionContext) {
-        return "spring fallback for " + executionContext.getMethod().getName();
+        return "spring faulttolerance for " + executionContext.getMethod().getName();
     }
 }

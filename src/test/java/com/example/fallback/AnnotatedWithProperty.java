@@ -1,4 +1,4 @@
-package com.example;
+package com.example.fallback;
 
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AnnotatedWithProperty {
 
-    @Fallback(fallbackMethod = "${fallback.name}")
+    @Fallback(fallbackMethod = "${faulttolerance.name}")
     public String invoke() {
         throw new RuntimeException();
     }

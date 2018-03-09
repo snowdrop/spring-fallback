@@ -1,4 +1,4 @@
-package com.example;
+package com.example.fallback;
 
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.springframework.stereotype.Component;

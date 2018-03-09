@@ -1,11 +1,11 @@
-package me.snowdrop.fallback.interceptor;
+package me.snowdrop.faulttolerance;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 
 import java.lang.reflect.Method;
 
-final class DefaultExecutionContext implements ExecutionContext {
+public final class DefaultExecutionContext implements ExecutionContext {
 
     private final Method method;
     private final Object[] parameters;
@@ -15,7 +15,7 @@ final class DefaultExecutionContext implements ExecutionContext {
         this.parameters = parameters;
     }
 
-    static DefaultExecutionContext fromMethodInvocation(MethodInvocation methodInvocation) {
+    public static DefaultExecutionContext fromMethodInvocation(MethodInvocation methodInvocation) {
         return new DefaultExecutionContext(methodInvocation.getMethod(), methodInvocation.getArguments());
     }
 

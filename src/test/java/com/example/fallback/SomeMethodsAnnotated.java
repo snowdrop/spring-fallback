@@ -1,4 +1,4 @@
-package com.example;
+package com.example.fallback;
 
 import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 import org.eclipse.microprofile.faulttolerance.Fallback;
@@ -31,6 +31,6 @@ public class SomeMethodsAnnotated {
     }
 
     public String nonDefaultError(ExecutionContext executionContext) {
-        return "fallback from" + executionContext.getMethod().getName();
+        return "faulttolerance from" + executionContext.getMethod().getName();
     }
 }

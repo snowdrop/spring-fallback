@@ -1,16 +1,17 @@
-package me.snowdrop.fallback.interceptor;
+package me.snowdrop.faulttolerance.interceptor;
 
-import org.eclipse.microprofile.faulttolerance.ExecutionContext;
+import me.snowdrop.faulttolerance.DefaultExecutionContext;
 import org.aopalliance.intercept.MethodInvocation;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-final class HandlerMethodInvokerUtil {
+public final class HandlerMethodInvokerUtil {
 
     private HandlerMethodInvokerUtil() {}
 
-    static Object invoke(MethodInvocation invocation, Method targetMethod, Object targetObject)
+    public static Object invoke(MethodInvocation invocation, Method targetMethod, Object targetObject)
             throws InvocationTargetException, IllegalAccessException {
 
         try {

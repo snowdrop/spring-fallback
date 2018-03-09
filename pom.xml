@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>me.snowdrop</groupId>
-	<artifactId>spring-fallback</artifactId>
+	<artifactId>spring-faulttolerance</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>spring-fallback</name>
-	<description>Fallback POC</description>
+	<name>spring-faulttolerance</name>
+	<description>Spring Fault Tolerance Implementation POC</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

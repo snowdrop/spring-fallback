@@ -1,5 +1,7 @@
-package me.snowdrop.fallback;
+package me.snowdrop.faulttolerance;
 
+import me.snowdrop.faulttolerance.configuration.FallbackConfiguration;
+import me.snowdrop.faulttolerance.configuration.RetryConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
@@ -11,8 +13,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @EnableAspectJAutoProxy(proxyTargetClass = false)
-@Import(FallbackConfiguration.class)
-public @interface EnableFallback {
+@Import({FallbackConfiguration.class, RetryConfiguration.class})
+public @interface EnableFaultTolerance {
 
     /**
      * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
