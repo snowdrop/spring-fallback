@@ -33,6 +33,8 @@ public @interface Fallback {
      * The method to be executed as the fallback method
      * If the name is enclosed in '${}' the it is assumed to be a property
      * and will be looked up in the Spring Environment
+     *
+     * This method can either have zero parameters, or a single param of type me.snowdrop.fallback.ExecutionContext
      */
     String fallbackMethod() default  "error";
 }

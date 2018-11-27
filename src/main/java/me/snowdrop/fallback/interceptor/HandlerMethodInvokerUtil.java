@@ -41,7 +41,7 @@ final class HandlerMethodInvokerUtil {
             }
 
             throw new IllegalArgumentException("The target method " + targetMethod + " is not valid" +
-                    "Either use no params to the fallback handler or a single parameters of type:" + ExecutionContext.class);
+                    "Either use no parameters to the fallback handler or a single parameter of type:" + ExecutionContext.class);
         }
 
     }
