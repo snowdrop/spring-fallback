@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/snowdrop/spring-fallback.svg?style=shield)](https://circleci.com/gh/snowdrop/spring-fallback)
+
 ## Purpose
 
 The purpose of this project is to provide a simple `@Fallback` annotation that will provide
