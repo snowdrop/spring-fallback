@@ -37,10 +37,11 @@ final class HandlerMethodInvokerUtil {
             }
 
             if ((parameterTypes.length == 1) && (ExecutionContext.class.equals(parameterTypes[0]))) {
-                return targetMethod.invoke(targetObject, DefaultExecutionContext.fromMethodInvocation(invocation));
+                return targetMethod.invoke(targetObject, DefaultExecutionContext.fromMethodInvocation(invocation, throwable));
             }
 
-            throw new IllegalArgumentException("The target method " + targetMethod + " is not valid");
+            throw new IllegalArgumentException("The target method " + targetMethod + " is not valid" +
+                    "Either use no params to the fallback handler or a single parameters of type:" + ExecutionContext.class);
         }
 
     }

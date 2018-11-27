@@ -46,6 +46,7 @@ public class SomeMethodsAnnotated {
     }
 
     public String nonDefaultError(ExecutionContext executionContext) {
-        return "fallback from" + executionContext.getMethod().getName();
+        return "fallback from " + executionContext.getMethod().getName()
+                + " with throwable " + executionContext.getThrowable().getClass();
     }
 }

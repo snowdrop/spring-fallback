@@ -97,7 +97,8 @@ public class FallbackTest {
     public void testNonDefaultErrorMethodWithParam() {
         assertThat(someMethodsAnnotated.nonDefaultErrorSayHi())
                 .contains("fallback")
-                .contains("nonDefaultErrorSayHi");
+                .contains("nonDefaultErrorSayHi")
+                .contains("java.lang.RuntimeException");
     }
 
     @Test

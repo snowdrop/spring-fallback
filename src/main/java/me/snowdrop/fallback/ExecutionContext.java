@@ -30,4 +30,9 @@ public interface ExecutionContext {
      *
      */
     Object[] getParameters();
+
+    /**
+     * Returns the throwable that caused the fallback invocation
+     */
+    Throwable getThrowable();
 }

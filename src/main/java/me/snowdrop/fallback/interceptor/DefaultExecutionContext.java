@@ -24,21 +24,30 @@ final class DefaultExecutionContext implements ExecutionContext {
 
     private final Method method;
     private final Object[] parameters;
+    private final Throwable throwable;
 
-    DefaultExecutionContext(Method method, Object[] parameters) {
+    DefaultExecutionContext(Method method, Object[] parameters, Throwable throwable) {
         this.method = method;
         this.parameters = parameters;
+        this.throwable = throwable;
     }
 
-    static DefaultExecutionContext fromMethodInvocation(MethodInvocation methodInvocation) {
-        return new DefaultExecutionContext(methodInvocation.getMethod(), methodInvocation.getArguments());
+    static DefaultExecutionContext fromMethodInvocation(MethodInvocation methodInvocation, Throwable throwable) {
+        return new DefaultExecutionContext(methodInvocation.getMethod(), methodInvocation.getArguments(), throwable);
     }
 
+    @Override
     public Method getMethod() {
         return method;
     }
 
+    @Override
     public Object[] getParameters() {
         return parameters;
+    }
+
+    @Override
+    public Throwable getThrowable() {
+        return throwable;
     }
 }
