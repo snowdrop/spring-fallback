@@ -25,6 +25,7 @@
 
 	<name>spring-fallback</name>
 	<description>Library that provides a purpose built @Fallback annotation for Spring</description>
+    <url>http://www.snowdrop.me</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
