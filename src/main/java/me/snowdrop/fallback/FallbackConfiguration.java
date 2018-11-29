@@ -16,21 +16,16 @@
 package me.snowdrop.fallback;
 
 import org.aopalliance.aop.Advice;
-import org.springframework.aop.ClassFilter;
-import org.springframework.aop.IntroductionAdvisor;
-import org.springframework.aop.MethodMatcher;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
 import org.springframework.aop.support.ComposablePointcut;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.aop.support.annotation.AnnotationClassFilter;
-import org.springframework.aop.support.annotation.AnnotationMethodMatcher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -78,28 +73,13 @@ public class FallbackConfiguration extends AbstractPointcutAdvisor implements Be
 
     private static final class AnnotationClassOrMethodPointcut extends StaticMethodMatcherPointcut {
 
-        private final MethodMatcher methodResolver;
-
         AnnotationClassOrMethodPointcut(Class<? extends Annotation> annotationType) {
-            this.methodResolver = new AnnotationMethodMatcher(annotationType);
             setClassFilter(new AnnotationClassOrMethodFilter(annotationType));
         }
 
         @Override
         public boolean matches(Method method, Class<?> targetClass) {
-            return getClassFilter().matches(targetClass) || this.methodResolver.matches(method, targetClass);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) {
-                return true;
-            }
-            if (!(other instanceof AnnotationClassOrMethodPointcut)) {
-                return false;
-            }
-            AnnotationClassOrMethodPointcut otherAdvisor = (AnnotationClassOrMethodPointcut) other;
-            return ObjectUtils.nullSafeEquals(this.methodResolver, otherAdvisor.methodResolver);
+            return getClassFilter().matches(targetClass);
         }
 
     }
