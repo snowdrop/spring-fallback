@@ -66,7 +66,7 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
 				}
 				final Map<Method, MethodInterceptor> delegatesForTarget = this.delegatesCache.get(target);
 				if (!delegatesForTarget.containsKey(method)) {
-                    final Fallback fallback = findAnnotation(target, method);
+                    final Fallback fallback = findAnnotation(method);
 					if (fallback == null) { //if the target does not contain the fallback method, create a cache entry with a null value
 						return delegatesForTarget.put(method, null);
 					}
@@ -78,7 +78,7 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
 		return this.delegatesCache.get(target).get(method);
 	}
 
-    private Fallback findAnnotation(Object target, Method method) {
+    private Fallback findAnnotation(Method method) {
         final Fallback fallbackFromMethod = AnnotationUtils.findAnnotation(method, Fallback.class);
 
         if (fallbackFromMethod != null) {
@@ -91,23 +91,9 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
         }
 
 
-        return findAnnotationOnTarget(target, method);
+        return null;
     }
 
-    private Fallback findAnnotationOnTarget(Object target, Method method) {
-		try {
-			final Method targetMethod = target.getClass().getMethod(method.getName(), method.getParameterTypes());
-            final Fallback fallback = AnnotationUtils.findAnnotation(targetMethod, Fallback.class);
-			if (fallback == null) {
-				return AnnotationUtils.findAnnotation(targetMethod.getDeclaringClass(), Fallback.class);
-			}
-
-			return null;
-		}
-		catch (Exception e) {
-			return null;
-		}
-	}
 
     private Method findTargetMethod(Class fallbackClass, String fallbackMethod) {
         final Method noArgsMethod = ReflectionUtils.findMethod(fallbackClass, fallbackMethod);
