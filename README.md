@@ -160,7 +160,7 @@ public class Bean {
 
 Furthermore, the `@Fallback` annotation can be placed on superclasses or interfaces.
 
-Finally, the fallback method can be a static method of some other class. For example the following would work:
+The fallback method can be a static method of some other class. For example the following would work:
 
 ```java
 public final class FallbackUtil {
@@ -176,6 +176,28 @@ public final class FallbackUtil {
 public class Bean {
 
     @Fallback(value = FallbackUtil.class, fallbackMethod = "handle")
+    public String example() {
+        throw new RuntimeException();
+    }
+} 
+```
+
+Finally, the fallback method can also be a method of some other spring bean as shown in the following example:
+
+```java
+
+@Component
+public class FallbackBean {
+
+    public String error(ExecutionContext executionContext) {
+        return "fallback from " + executionContext.getMethod().getName();
+    }
+}
+
+@Component
+public class Bean {
+
+    @Fallback(value = FallbackBean.class)
     public String example() {
         throw new RuntimeException();
     }
