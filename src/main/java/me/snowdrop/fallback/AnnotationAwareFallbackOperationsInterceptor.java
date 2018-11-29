@@ -15,8 +15,7 @@
  */
 package me.snowdrop.fallback;
 
-import me.snowdrop.fallback.interceptor.NonStaticErrorHandlerFallbackOperationsInterceptor;
-import me.snowdrop.fallback.interceptor.StaticErrorHandlerFallbackOperationsInterceptor;
+import me.snowdrop.fallback.interceptor.FallbackInterceptor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -30,7 +29,10 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Interceptor that parses the fallback metadata on the method it is invoking and
@@ -39,7 +41,7 @@ import java.util.Map;
  */
 public class AnnotationAwareFallbackOperationsInterceptor implements MethodInterceptor {
 
-	private final Map<Object, Map<Method, MethodInterceptor>> delegatesCache = new HashMap<>();
+	private final Map<Object, Map<Method, MethodInterceptor>> methodInterceptorCache = new HashMap<>();
 
 	private final BeanFactory beanFactory;
 
@@ -49,65 +51,44 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		final MethodInterceptor delegate = getDelegate(invocation.getThis(), invocation.getMethod());
-		if (delegate != null) {
-			return delegate.invoke(invocation);
+		final MethodInterceptor methodInterceptor = getMethodInterceptor(invocation.getThis(), invocation.getMethod());
+		if (methodInterceptor != null) {
+			return methodInterceptor.invoke(invocation);
 		}
 		else {
 			return invocation.proceed();
 		}
 	}
 
-	private MethodInterceptor getDelegate(Object target, Method method) {
-		if (!this.delegatesCache.containsKey(target) || !this.delegatesCache.get(target).containsKey(method)) {
-			synchronized (this.delegatesCache) {
-				if (!this.delegatesCache.containsKey(target)) {
-					this.delegatesCache.put(target, new HashMap<>());
-				}
-				final Map<Method, MethodInterceptor> delegatesForTarget = this.delegatesCache.get(target);
+	private MethodInterceptor getMethodInterceptor(Object target, Method method) {
+		if (!this.methodInterceptorCache.containsKey(target) || !this.methodInterceptorCache.get(target).containsKey(method)) {
+			synchronized (this.methodInterceptorCache) {
+                this.methodInterceptorCache.putIfAbsent(target, new HashMap<>());
+				final Map<Method, MethodInterceptor> delegatesForTarget = this.methodInterceptorCache.get(target);
 				if (!delegatesForTarget.containsKey(method)) {
-                    final Fallback fallback = findAnnotation(target, method);
-					if (fallback == null) { //if the target does not contain the fallback method, create a cache entry with a null value
+                    final Set<Fallback> fallbacks = findAnnotations(method);
+					if (fallbacks.isEmpty()) { //if the target does not contain the fallback method, create a cache entry with a null value
 						return delegatesForTarget.put(method, null);
 					}
 
-                    delegatesForTarget.put(method, getDelegate(target, fallback));
+                    delegatesForTarget.put(method, doGetMethodInterceptor(target, fallbacks));
 				}
 			}
 		}
-		return this.delegatesCache.get(target).get(method);
+		return this.methodInterceptorCache.get(target).get(method);
 	}
 
-    private Fallback findAnnotation(Object target, Method method) {
-        final Fallback fallbackFromMethod = AnnotationUtils.findAnnotation(method, Fallback.class);
+    private Set<Fallback> findAnnotations(Method method) {
+        final Set<Fallback> fallbacks = AnnotationUtils.getRepeatableAnnotations(method, Fallback.class);
 
-        if (fallbackFromMethod != null) {
-            return fallbackFromMethod;
+        // look up the annotation on the class if none is present on the method
+        if(fallbacks.isEmpty()) {
+            return AnnotationUtils.getRepeatableAnnotations(method.getDeclaringClass(), Fallback.class);
         }
 
-        final Fallback fallbackFromClass = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Fallback.class);
-        if (fallbackFromClass != null) {
-            return fallbackFromClass;
-        }
-
-
-        return findAnnotationOnTarget(target, method);
+        return fallbacks;
     }
 
-    private Fallback findAnnotationOnTarget(Object target, Method method) {
-		try {
-			final Method targetMethod = target.getClass().getMethod(method.getName(), method.getParameterTypes());
-            final Fallback fallback = AnnotationUtils.findAnnotation(targetMethod, Fallback.class);
-			if (fallback == null) {
-				return AnnotationUtils.findAnnotation(targetMethod.getDeclaringClass(), Fallback.class);
-			}
-
-			return null;
-		}
-		catch (Exception e) {
-			return null;
-		}
-	}
 
     private Method findTargetMethod(Class fallbackClass, String fallbackMethod) {
         final Method noArgsMethod = ReflectionUtils.findMethod(fallbackClass, fallbackMethod);
@@ -119,42 +100,53 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
         return ReflectionUtils.findMethod(fallbackClass, fallbackMethod, ExecutionContext.class);
     }
 
-    private MethodInterceptor getDelegate(Object target, Fallback fallback) {
-        final String methodName = getMethodName(fallback);
-
-        if (fallback.value().equals(void.class)) { //we need to use the fallback method of the target class
-            final Method targetFallbackMethod = findTargetMethod(getTargetClass(target), methodName);
-
-            if (targetFallbackMethod == null) {
-                throw new IllegalArgumentException(target + " does not contain a method named '" + methodName + "'");
-            }
-
-            return new NonStaticErrorHandlerFallbackOperationsInterceptor(targetFallbackMethod, target);
-        }
-        else {
-            final Method targetFallbackMethod = findTargetMethod(fallback.value(), methodName);
-
-            if (targetFallbackMethod == null) {
-                throw new IllegalArgumentException(fallback.value() + " does not contain a static method named '" + methodName + "'");
-            }
-
-            if (Modifier.isStatic(targetFallbackMethod.getModifiers())) {  //in this a static method is used
-                return new StaticErrorHandlerFallbackOperationsInterceptor(targetFallbackMethod);
-            }
-            else { //finally we attempt to find a Spring bean using the class supplied
-
-                try {
-                    return new NonStaticErrorHandlerFallbackOperationsInterceptor(
-                            targetFallbackMethod,
-                            beanFactory.getBean(fallback.value())
-                    );
-                } catch (BeansException e) {
-                    throw new UnsupportedOperationException("Unable to retrieve bean of class " + fallback.value(), e);
-                }
+    private MethodInterceptor doGetMethodInterceptor(Object target, Set<Fallback> fallbacks) {
 
 
-            }
-        }
+        final List<FallbackInterceptor.Configuration> configurationList =
+                fallbacks
+                        .stream()
+                        .map(f -> {
+                            final String methodName = getMethodName(f);
+                            if (void.class.equals(f.value())) { //we need to use the fallback method of the target class
+                                final Method targetFallbackMethod = findTargetMethod(getTargetClass(target), methodName);
+
+                                if (targetFallbackMethod == null) {
+                                    throw new IllegalArgumentException(target + " does not contain a method named '" + methodName + "'");
+                                }
+
+                                return new FallbackInterceptor.Configuration(targetFallbackMethod, target, f.throwable(), f.order());
+                            }
+                            else {
+                                final Method targetFallbackMethod = findTargetMethod(f.value(), methodName);
+
+                                if (targetFallbackMethod == null) {
+                                    throw new IllegalArgumentException(
+                                            "Class: '" + f.value() + "' does not contain a static method named '"
+                                                    + methodName + "'");
+                                }
+
+                                if (Modifier.isStatic(targetFallbackMethod.getModifiers())) {  //in this a static method is used
+                                    return new FallbackInterceptor.Configuration(targetFallbackMethod, null, f.throwable(), f.order());
+                                }
+                                else { //finally we attempt to find a Spring bean using the class supplied
+                                    final Object bean = beanFactory.getBean(f.value());
+
+                                    try {
+                                        return new FallbackInterceptor.Configuration(
+                                                targetFallbackMethod, bean, f.throwable(), f.order());
+                                    } catch (BeansException e) {
+                                        throw new UnsupportedOperationException("Unable to retrieve bean of Class '"
+                                                + f.value() + "' from the ApplicationContext", e);
+                                    }
+
+
+                                }
+                            }
+                        })
+                        .collect(Collectors.toList());
+
+        return new FallbackInterceptor(configurationList);
     }
 
     private String getMethodName(Fallback fallback) {

@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.snowdrop.fallback.interceptor;
+package com.example;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import me.snowdrop.fallback.Fallback;
 
-import java.lang.reflect.Method;
+import java.io.IOException;
 
-public class StaticErrorHandlerFallbackOperationsInterceptor implements MethodInterceptor {
+@Fallback(fallbackMethod = "ioHandler", throwable = IOException.class)
+@Fallback(fallbackMethod = "runtimeHandler", throwable = RuntimeException.class)
+public class SomeSuperClassWithMultipleFallbacksOnClass {
 
-    private final Method targetMethod;
+    public Object dummy(Exception typeToThrow) throws Exception {
+        if(typeToThrow != null) {
+            throw typeToThrow;
+        }
 
-    public StaticErrorHandlerFallbackOperationsInterceptor(Method targetMethod) {
-        this.targetMethod = targetMethod;
+        return "noException";
     }
 
-    @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        return HandlerMethodInvokerUtil.invoke(invocation, targetMethod, null);
+    private String ioHandler() {
+        return "io";
+    }
+
+    private String runtimeHandler() {
+        return "runtime";
     }
 }
