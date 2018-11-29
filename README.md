@@ -210,8 +210,8 @@ The library provides the ability to specify multiple Fallback annotations on a s
 as can be seen in the following example:
 
 ```java
-@Fallback(exception=IOException.class, value = "ioErrorHandler", order = Integer.MIN_VALUE)
-@Fallback(exception=RuntimeException.class, value ="runtimeErrorHandler", order = Integer.MIN_VALUE)
+@Fallback(throwable=IOException.class, value = "ioErrorHandler", order = Integer.MIN_VALUE)
+@Fallback(throwable=RuntimeException.class, value ="runtimeErrorHandler", order = Integer.MIN_VALUE)
 @Fallback("defaultErrorHandler")
 public class Example {
     

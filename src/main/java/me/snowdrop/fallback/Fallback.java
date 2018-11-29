@@ -37,19 +37,21 @@ public @interface Fallback {
     String fallbackMethod() default  "error";
 
     /**
-     * The type of exception that this Fallback method handles
+     * The type of throwable that this Fallback method handles
      *
-     * By default all exceptions are handled
+     * By default all Throwables are handled
      *
      * This is particularly useful when multiple fallbacks are configured for the same method
+     * and should be used in conjunction with order
      */
-    Class<? extends Exception> exception() default Exception.class;
+    Class<? extends Throwable> throwable() default Throwable.class;
 
     /**
      * Order in which to the fallback will be used
-     * smaller values mean higher order
+     * The smaller the value of order, the more priority the fallback is assigned
      *
-     * order is particularly useful when multiple fallbacks are configured for the same method
+     * This is particularly important when multiple fallbacks are configured for the same method
+     * and should be used in conjunction with throwable
      */
     int order() default 0;
 

@@ -19,8 +19,8 @@ import me.snowdrop.fallback.Fallback;
 
 import java.io.IOException;
 
-@Fallback(fallbackMethod = "ioHandler", exception = IOException.class)
-@Fallback(fallbackMethod = "runtimeHandler", exception = RuntimeException.class)
+@Fallback(fallbackMethod = "ioHandler", throwable = IOException.class)
+@Fallback(fallbackMethod = "runtimeHandler", throwable = RuntimeException.class)
 public class SomeSuperClassWithMultipleFallbacksOnClass {
 
     public Object dummy(Exception typeToThrow) throws Exception {

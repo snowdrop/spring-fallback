@@ -63,9 +63,7 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
 	private MethodInterceptor getMethodInterceptor(Object target, Method method) {
 		if (!this.methodInterceptorCache.containsKey(target) || !this.methodInterceptorCache.get(target).containsKey(method)) {
 			synchronized (this.methodInterceptorCache) {
-				if (!this.methodInterceptorCache.containsKey(target)) {
-					this.methodInterceptorCache.put(target, new HashMap<>());
-				}
+                this.methodInterceptorCache.putIfAbsent(target, new HashMap<>());
 				final Map<Method, MethodInterceptor> delegatesForTarget = this.methodInterceptorCache.get(target);
 				if (!delegatesForTarget.containsKey(method)) {
                     final Set<Fallback> fallbacks = findAnnotations(method);
@@ -110,14 +108,14 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
                         .stream()
                         .map(f -> {
                             final String methodName = getMethodName(f);
-                            if (f.value().equals(void.class)) { //we need to use the fallback method of the target class
+                            if (void.class.equals(f.value())) { //we need to use the fallback method of the target class
                                 final Method targetFallbackMethod = findTargetMethod(getTargetClass(target), methodName);
 
                                 if (targetFallbackMethod == null) {
                                     throw new IllegalArgumentException(target + " does not contain a method named '" + methodName + "'");
                                 }
 
-                                return new FallbackInterceptor.Configuration(targetFallbackMethod, target, f.exception(), f.order());
+                                return new FallbackInterceptor.Configuration(targetFallbackMethod, target, f.throwable(), f.order());
                             }
                             else {
                                 final Method targetFallbackMethod = findTargetMethod(f.value(), methodName);
@@ -129,14 +127,14 @@ public class AnnotationAwareFallbackOperationsInterceptor implements MethodInter
                                 }
 
                                 if (Modifier.isStatic(targetFallbackMethod.getModifiers())) {  //in this a static method is used
-                                    return new FallbackInterceptor.Configuration(targetFallbackMethod, null, f.exception(), f.order());
+                                    return new FallbackInterceptor.Configuration(targetFallbackMethod, null, f.throwable(), f.order());
                                 }
                                 else { //finally we attempt to find a Spring bean using the class supplied
                                     final Object bean = beanFactory.getBean(f.value());
 
                                     try {
                                         return new FallbackInterceptor.Configuration(
-                                                targetFallbackMethod, bean, f.exception(), f.order());
+                                                targetFallbackMethod, bean, f.throwable(), f.order());
                                     } catch (BeansException e) {
                                         throw new UnsupportedOperationException("Unable to retrieve bean of Class '"
                                                 + f.value() + "' from the ApplicationContext", e);

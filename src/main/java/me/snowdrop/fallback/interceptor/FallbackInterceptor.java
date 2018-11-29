@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Handled the actual of invocation of the original method and if an exception is thrown by it,
+ * Handled the actual of invocation of the original method and if an throwable is thrown by it,
  * is it handled by the proper fallback method.
- * The proper fallback method is determined by the type of exception that was thrown
+ * The proper fallback method is determined by the type of throwable that was thrown
  */
 public class FallbackInterceptor implements MethodInterceptor {
 
@@ -34,7 +34,7 @@ public class FallbackInterceptor implements MethodInterceptor {
                     return invokeFallback(invocation, throwable, conf.getHandlerObject(), conf.getTargetFallbackMethod());
                 }
             }
-            //none of the fallback handlers can handle the exception so just rethrow it
+            //none of the fallback handlers can handle the throwable so just rethrow it
             throw throwable;
         }
     }
@@ -65,13 +65,13 @@ public class FallbackInterceptor implements MethodInterceptor {
 
         private final Method targetFallbackMethod;
         private final Object handlerObject;
-        private final Class<? extends Exception> exceptionToHandle;
+        private final Class<? extends Throwable> exceptionToHandle;
         // the smaller the number, the higher the order of this configuration
         private final int order;
 
         public Configuration(Method targetFallbackMethod,
                              Object handlerObject,
-                             Class<? extends Exception> exceptionToHandle,
+                             Class<? extends Throwable> exceptionToHandle,
                              int order) {
             this.targetFallbackMethod = targetFallbackMethod;
             this.handlerObject = handlerObject;
@@ -87,7 +87,7 @@ public class FallbackInterceptor implements MethodInterceptor {
             return handlerObject;
         }
 
-        public Class<? extends Exception> getExceptionToHandle() {
+        public Class<? extends Throwable> getExceptionToHandle() {
             return exceptionToHandle;
         }
 

@@ -20,7 +20,7 @@ import me.snowdrop.fallback.Fallback;
 public class SomeSuperClassWithMultipleFallbacksOnMethod {
 
     @Fallback(fallbackMethod = "genericHandler")
-    @Fallback(fallbackMethod = "runtimeHandler", exception = RuntimeException.class, order = -1)
+    @Fallback(fallbackMethod = "runtimeHandler", throwable = RuntimeException.class, order = -1)
     public Object annotatedMethod(Exception typeToThrow) throws Exception {
         if(typeToThrow != null) {
             throw typeToThrow;

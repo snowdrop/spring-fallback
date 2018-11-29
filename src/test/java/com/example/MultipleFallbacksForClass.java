@@ -7,9 +7,9 @@ import java.io.IOException;
 
 @Component
 @Fallback(fallbackMethod = "genericHandler", order = Integer.MAX_VALUE)
-@Fallback(fallbackMethod = "ioHandler", exception = IOException.class)
-@Fallback(fallbackMethod = "fileHandler", exception = IOException.class, order = Integer.MIN_VALUE)
-@Fallback(fallbackMethod = "runtimeHandler", exception = RuntimeException.class)
+@Fallback(fallbackMethod = "ioHandler", throwable = IOException.class)
+@Fallback(fallbackMethod = "fileHandler", throwable = IOException.class, order = Integer.MIN_VALUE)
+@Fallback(fallbackMethod = "runtimeHandler", throwable = RuntimeException.class)
 public class MultipleFallbacksForClass {
 
 
