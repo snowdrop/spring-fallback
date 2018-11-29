@@ -15,13 +15,11 @@
  */
 package me.snowdrop.fallback;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(Fallback.List.class)
 public @interface Fallback {
 
     /**
@@ -37,4 +35,27 @@ public @interface Fallback {
      * This method can either have zero parameters, or a single param of type me.snowdrop.fallback.ExecutionContext
      */
     String fallbackMethod() default  "error";
+
+    /**
+     * The type of exception that this Fallback method handles
+     *
+     * By default all exceptions are handled
+     *
+     * This is particularly useful when multiple fallbacks are configured for the same method
+     */
+    Class<? extends Exception> exception() default Exception.class;
+
+    /**
+     * Order in which to the fallback will be used
+     * smaller values mean higher order
+     *
+     * order is particularly useful when multiple fallbacks are configured for the same method
+     */
+    int order() default 0;
+
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface List {
+        Fallback[] value();
+    }
 }

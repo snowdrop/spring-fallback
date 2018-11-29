@@ -203,3 +203,40 @@ public class Bean {
     }
 } 
 ```
+
+### Multiple fallbacks for a single method / class
+
+The library provides the ability to specify multiple Fallback annotations on a single method or class
+as can be seen in the following example:
+
+```java
+@Fallback(exception=IOException.class, value = "ioErrorHandler", order = Integer.MIN_VALUE)
+@Fallback(exception=RuntimeException.class, value ="runtimeErrorHandler", order = Integer.MIN_VALUE)
+@Fallback("defaultErrorHandler")
+public class Example {
+    
+    public String someMethod() {
+        // could throw various exceptions depending on the codepath
+    }
+    
+    public String ioErrorHandler() {
+        return "io";
+    }
+    
+    public String runtimeErrorHandler() {
+        return "runtime";
+    }
+    
+    public String defaultErrorHandler() {
+        return "default";
+    }    
+}
+```
+
+In the example above if `someMethod` throws an `IOException` (or any of it's subclasses)
+then `ioErrorHandler` will handle the error and `"io"` will be returned.
+If `someMethod` throws a `RuntimeException` (or any of it's subclasses)
+then `runtimeErrorHandler` will handle the error and `"runtime"` will be returned.
+Any other exception will be handled by `defaultErrorHandler`.
+
+In cases such as the above it's very important to correctly specify the order (lower values mean that the handler has a higher priority)

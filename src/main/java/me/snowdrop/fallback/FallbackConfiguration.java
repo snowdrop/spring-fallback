@@ -87,15 +87,19 @@ public class FallbackConfiguration extends AbstractPointcutAdvisor implements Be
     private static final class AnnotationClassOrMethodFilter extends AnnotationClassFilter {
 
         private final AnnotationMethodsResolver methodResolver;
+        private final Class<? extends Annotation> annotationType;
 
         AnnotationClassOrMethodFilter(Class<? extends Annotation> annotationType) {
             super(annotationType, true);
+            this.annotationType = annotationType;
             this.methodResolver = new AnnotationMethodsResolver(annotationType);
         }
 
         @Override
         public boolean matches(Class<?> clazz) {
-            return super.matches(clazz) || this.methodResolver.hasAnnotatedMethods(clazz);
+            return super.matches(clazz)
+                    || !AnnotationUtils.getRepeatableAnnotations(clazz, annotationType).isEmpty()
+                    || this.methodResolver.hasAnnotatedMethods(clazz);
         }
 
     }
@@ -115,9 +119,13 @@ public class FallbackConfiguration extends AbstractPointcutAdvisor implements Be
                         if (found.get()) {
                             return;
                         }
-                        Annotation annotation = AnnotationUtils.findAnnotation(method,
-                                annotationType);
-                        if (annotation != null) { found.set(true); }
+                        if (!AnnotationUtils.getRepeatableAnnotations(method,annotationType).isEmpty()) {
+                            found.set(true);
+                            return;
+                        }
+                        if(AnnotationUtils.findAnnotation(method, annotationType) != null) {
+                            found.set(true);
+                        }
                     });
             return found.get();
         }
